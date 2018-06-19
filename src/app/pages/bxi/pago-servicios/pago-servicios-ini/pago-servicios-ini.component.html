@@ -1,0 +1,99 @@
+<form [formGroup]="myForm" novalidate>
+    <div ng-cloak class="padding-barToTittle">
+        <h2 class="text-center color-letra">Pago de Servicios</h2>
+    </div>
+    <fieldset class="padding-TittleToFieldset padding-fieldset-general">
+        <div class="row sumando-form-group letranegrita padding-InFieldset">
+            <div class="col-sm-1 sumando-bg-red group-name">
+                Desde
+            </div>
+            <div class="col-sm-11 group-controls  padding-InFieldset" style="padding-left: 0px; padding-right:  0px;">
+                <div class="form-group">
+                    <div class="sumando-bg-white">
+                        <input type="hidden">
+                        <div class="dropdown sumando-dropdown-account">
+                            <button class="btn btn-default btn-block dropdown-toggle btn-color-cuentas " type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" style="padding-right: 0px;padding-top: 0px;padding-bottom: 0px">
+                <table id="tableOrigen" style="display: none" width="100%">
+                  <tr>
+                    <td align="left" width="45%">
+                      <strong><label  id="lblAliasOrigen" #lblAliasOrigen></label></strong>
+                    </td>
+                    <td align="left" width="45%">
+                      <strong>$<label id ="lblSaldoOrigen" #lblSaldoOrigen></label>
+                      </strong>
+                    </td>
+                    <td width="5%" rowspan="2" class="dropdown-caret" align="rigth" >
+                      <img  class="img-select-seleccion" src="./assets/img/bg_selectN.png">
+                    </td>
+                  </tr>
+                  <tr>
+                    <td align="left">Cuenta <label id="lblCuentaOrigen" #lblCuentaOrigen></label></td>
+                    <td align="left">Saldo Disponible</td>
+                  </tr>
+                </table>
+                <table  id="tableDefaultOrigen" width="100%">
+                  <tr>
+                    <td align="left" rowspan="2">Seleccione una cuenta de origen...</td>
+                    <td width="5%" rowspan="2" class="dropdown-caret">
+                        <img src="./assets/img/bg_selectN.png" class="select-img" style="width: 55px !important">
+                    </td>
+                </tr>
+                </table>
+              </button>
+                            <div>
+                                <ul id="ul_Cuentas" #listaCuentas class="dropdown-menu btn-block" aria-labelledby="dropdownMenu1" style="width : 100%; height : 200px; overflow: auto;">
+
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="divisionInputs"></div>
+        <div class="row sumando-form-group letranegrita padding-InFieldset">
+            <div class="col-sm-1 sumando-bg-red group-name">Para</div>
+
+            <div class="col-sm-11 ">
+
+                <div class="clearfix"></div>
+
+                <div class="row">
+
+                    <div class="col-lg-12" style="padding-right: 0px; padding-left: 0px; height: 61px;">
+                        <input class="form-control" id="facturador" type="text" placeholder="Facturadores" #facturador [matKeyboard]="" (focus)="muestraFacturadores()" style="height: 100%;" formControlName='fcFacturador'/>
+                        <div *ngIf="showOptions" class="sumando-bg-white">
+                            <ul class="ul-facturadores">
+                                <li *ngFor="let empresa of listaEmpresas" style="list-style:none;"><a (click)="setValue(empresa)">{{empresa}}</a></li>
+                            </ul>
+
+                        </div>
+                        <div *ngIf="myForm.get('fcFacturador').errors  && myForm.get('fcFacturador').touched" class="alert alert-danger">
+                                <p *ngIf="myForm.get('fcFacturador').hasError('required')">
+                                        Dato obligatorio, favor de capturar.
+                                </p>
+                        </div>
+                    </div>
+                    <div class="clearfix"></div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="row actions-form-group text-right">
+            <div class="col-lg-9"></div>
+            <div class="col-lg-2">
+                <button class="btn btn-lg" type="button" (click)="irMenuBXI()" >Cancelar</button>
+            </div>
+            <!-- <button class="btn btn-primary  btn-lg" ng-click="onSiguiente01();" ng-disabled="currentForm.$invalid"> -->
+            <div class="col-lg-1" style="padding-right: 0px;">
+                <button  id="contiuar" type="button" class="btn color-botones btn-lg" [disabled]="(facturador.value == '') || (lblCuentaOrigen.textContent == '') || (lblAliasOrigen.textContent == '') || (lblSaldoOrigen.textContent == '')" (click)="saveData()">
+                Continuar
+              </button>
+            </div>
+        </div>
+
+    </fieldset>
+</form>

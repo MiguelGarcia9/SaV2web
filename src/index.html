@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>SucursappsAW</title>
+    <base href="/">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
+    <script type="text/javascript" src="assets/js/popper.js"></script>
+
+</head>
+
+<body onload="listener()">
+
+    <app-root></app-root>
+
+    <script type="text/javascript" src="assets/node_modules/ibm-mfp-web-sdk/node_modules/sjcl/sjcl.js"></script>
+    <script type="text/javascript" src="assets/node_modules/ibm-mfp-web-sdk/node_modules/jssha/src/sha.js"></script>
+    <script type="text/javascript" src="assets/node_modules/ibm-mfp-web-sdk/node_modules/promiz/promiz.min.js"></script>
+    <script type="text/javascript" src="assets/node_modules/ibm-mfp-web-sdk/lib/analytics/ibmmfpfanalytics.js"></script>
+    <script type="text/javascript" src="assets/node_modules/ibm-mfp-web-sdk/ibmmfpf.js"></script>
+
+    <script type="text/javascript" src="assets/jquery/jquery-3.3.1.min.js"></script>
+    <script type="text/javascript" src="assets/b4/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="assets/js/jquery.twbsPagination.js"></script>
+    <script type="text/javascript" src="assets/js/jquery.twbsPagination.min.js"></script>
+
+
+    <script type="text/javascript" src="assets/js/index.js"></script>
+    <!--PRA USO DE NODE EN ELECTRON -->
+    <script type="text/javascript" src="assets/js/bundle.js"></script>
+    <script type="text/javascript" src="assets/js/mca-cec-electron.js"></script>
+    <!-- scipt que sera llamdo desde el .ts para ejecutar las sentencias de node-->
+    <script language="javascript">
+        function handlerWriteDoc() {
+            console.log("entra funcion para escribir PDF");
+
+            var storagePDF = localStorage.getItem("doc");
+            var storageNombrePDF = localStorage.getItem("nombreDoc");
+            saveDocElectron(storagePDF, storageNombrePDF);
+        }
+    </script>
+    <script language="javascript">
+        function handlerCallPinpad() {
+            console.log("entra funcion para llamar pinpad");
+
+            callPinPad();
+
+        }
+    </script>
+
+</body>
+
+</html>
+
+<div class="modal fade" id="errorModal" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+                <p style="text-align: center;" id="mnsError" class="letranegrita">El servicio no esta disponible, por favor intentelo mas tarde.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">ACEPTAR</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+<!-- Modal -->
+<div class="modal fade " id="ModalTDDLogin" tabindex="-1" role="dialog" aria-labelledby="ModalTDDLogin" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 600px;">
+        <div class="modal-content shadowModal">
+            <div class="modal-header" align="center" style="align-self: center;">
+                <!--<button type="button" class="close bxi-red" data-dismiss="modal" aria-label="Close">
+                    <img src="assets/images/close-32-red.png">
+                  </button>-->
+
+                <h4 class="modal-title" align="center" style="display: block; color: #eb012a;  font-weight: 700;">
+                    Captura tu NIP para continuar
+                </h4>
+                <h4 class="modal-title" align="center" style="display: none; color: #eb012a;  font-weight: 700;">
+                    Captura nuevamente <br> tu NIP para continuar
+                </h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-lg-7" style="color: #eb012a">
+
+                        <h4 class="instruccionesMargin">Instrucciones:</h4>
+
+                        <div>
+
+                            <h4>1. Inserta la tarjeta</h4>
+                            <br>
+                            <h4>2. Retira la tarjeta</h4>
+                            <br>
+                            <h4>3. Captura tu NIP</h4>
+                            <br>
+                            <h4>4. Presiona el botón verde</h4>
+
+                        </div>
+
+                    </div>
+                    <div class="col-lg-5" style="margin-left: -30px;">
+                        <div class="align-center term_anim">
+                            &nbsp;
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" style="background-color: #eb012a;
+                border-color: #eb012a;">Continuar</button>
+            </div>
+          -->
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="ModalErrorTransaccion" tabindex="-1" role="dialog" aria-labelledby="ModalBXIError" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content shadowModal ">
+            <!--<div class="modal-header">
+
+            </div>
+        -->
+
+            <div class="modal-body" style="padding: 2rem;">
+
+                <h4 class="modal-title" style="color: #eb012a; font-weight: 700;">
+                    Aviso
+                </h4>
+
+                <div>
+                    <p>
+                        No fue posible confirmar la operación.
+                        <p id="msgError" class="letranegrita"> Por favor veridica tu saldo. </p>
+                    </p>
+                </div>
+                <h4 class="modal-title" style="color: #eb012a; font-weight: 700;">
+                    ¿Necesitas ayuda?
+                </h4>
+                <div>
+                    <p>
+                        Estamos a tus órdenes en los siguientes medios de contacto:
+                    </p>
+                </div>
+                <br>
+                <div class="row">
+                    <div class="col-lg-3">
+
+                    </div>
+                    <div class="col-lg-7">
+                        <p>
+                            Banortel:
+
+                        </p>
+                        <p>
+                            CDMX: (55) 5140-5600
+                        </p>
+                        <p>
+                            Monterrey: (81) 8156-9600
+                        </p>
+                        <p>
+                            Guadalajara: (33) 3669-9000
+                        </p>
+                        <p>
+                            Resto del país: 01-800-BANORTE
+                        </p>
+                        <p>
+                            (01-800-226-6783)
+                        </p>
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+
+                    <button type="button" class="color-botonesbtn btn-primary" data-dismiss="modal">Aceptar</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
