@@ -81,6 +81,14 @@ export class TransferenciaSpeiComponent implements OnInit {
 
   ngOnInit() {
 
+    localStorage.removeItem("des");
+    localStorage.removeItem("np");
+    localStorage.removeItem("res");
+    localStorage.removeItem("tr2");
+    localStorage.removeItem("tr2_serv");
+    localStorage.removeItem("np_serv");
+    localStorage.removeItem("res_serv");
+
     //ESTILOS Preferente
     let storageTipoClienteTar = localStorage.getItem("tipoClienteTar");
     let btnContinuar = document.getElementById("continuarspei");
@@ -406,39 +414,44 @@ export class TransferenciaSpeiComponent implements OnInit {
     $("#ModalTDDLogin").modal("show");
 
     let res;
+    this._validaNipService.validarDatosrespuesta().then(
+      mensaje => {
 
-    this._validaNipService.validarDatosrespuesta().then(mensaje => {
-      res = this._validaNipService.respuestaNip.res;
-      console.log(res);
+        res = this._validaNipService.respuestaNip.res;
+        console.log(res);
 
-      if (res === true) {
-        $("#ModalTDDLogin").modal("hide");
-        $("#_modal_please_wait").modal("show");
-        this_aux.validarSaldoMensualSoap();
-        this_aux.validarSaldoDiaSoap();
-
-        if (this_aux.nombreOperacion === "1") {
-          this_aux.transferenciaSPEISoap(
-            this_aux.clabe,
-            this_aux.nombreBene,
-            this_aux.referencia,
-            this_aux.importe,
-            this_aux.descripcion,
-            this_aux.email
-          );
-        } else if (this_aux.nombreOperacion === "2") {
-          this_aux.transferenciaTEFSoap(
-            this_aux.clabe,
-            this_aux.nombreBene,
-            this_aux.referencia,
-            this_aux.importe,
-            this_aux.descripcion,
-            this_aux.email
-          );
+        if (res === true) {
+          $('#ModalTDDLogin').modal('hide');
+          setTimeout( () => $('#_modal_please_wait').modal('hide'), 500 );
+          if (this_aux.nombreOperacion === "1") {
+            this_aux.transferenciaSPEISoap(
+              this_aux.clabe,
+              this_aux.nombreBene,
+              this_aux.referencia,
+              this_aux.importe,
+              this_aux.descripcion,
+              this_aux.email
+            );
+          } else if (this_aux.nombreOperacion === "2") {
+            this_aux.transferenciaTEFSoap(
+              this_aux.clabe,
+              this_aux.nombreBene,
+              this_aux.referencia,
+              this_aux.importe,
+              this_aux.descripcion,
+              this_aux.email
+            );
+          }
+          this._validaNipService.respuestaNip.res = "";
+        } else {
+          console.error("Mostrar modal las tarjetas no son iguales");
+          document.getElementById('mnsError').innerHTML =   "Las tarjetas no corresponden.";
+          $('#_modal_please_wait').modal('hide');
+          $('#errorModal').modal('show');
+          $('#ModalTDDLogin').modal('hide');
+          this._validaNipService.respuestaNip.res = "";
         }
-      } else {
-        console.error("Mostrar modal las tarjetas no son iguales");
       }
-    });
+    );
   }
 }

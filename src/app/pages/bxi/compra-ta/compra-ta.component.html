@@ -70,8 +70,9 @@
                             <div id="carriersDiv" class="row col-sm-8" style="height:60px; width:1200px;">
                                 <input type="hidden" id="carrier" name="carrier" />
                                 <div [ngClass]="{'Telcel col-sm-2': true , 'border border-danger': blClassT}">
-                                    <img src="./assets/img/7000.png" style="display: inline-block; float: center !important;" class="imagenTelcel compTelefonica" #importeTelcel id="imagenTelcel" name='importeTelcel' ngDefaultControl formControlName="operador" (click)="insertaSaldo(importeTelcel)"
-                                    />
+                                    <!-- <img src="./assets/img/7000.png" style="display: inline-block; float: center !important;" class="imagenTelcel compTelefonica" #importeTelcel id="imagenTelcel" name='importeTelcel' ngDefaultControl formControlName="operador" (click)="insertaSaldo(importeTelcel)"
+                                    /> -->
+                                    <img src="./assets/img/7000.png" style="display: inline-block; float: center !important;" class="imagenTelcel compTelefonica" #importeTelcel id="imagenTelcel" name='importeTelcel' ngDefaultControl (click)="insertaSaldo(importeTelcel)" />
                                 </div>
                                 <div [ngClass]="{'Movistar col-sm-2': true , 'border border-danger': blClassM}">
                                     <img src="./assets/img/11000.png" style="display: inline-block;float: left;" class="imagenMovistar compTelefonica" #importeMovi id="importeMovi" name='importeMovi' ngDefaultControl (click)="insertaSaldo(importeMovi)" />
@@ -88,8 +89,8 @@
                     <div class="row padding-InFieldset">
                         <label style="width: 8.3%;" class="col-sm-2 control-label">Monto</label>
                         <div class="col-sm-1 amount-list" *ngFor="let recarga of recargas; let i = index">
-
-                            <label formControlName="importe" ngDefaultControl #importe id="{{recarga.ImporteTiempoAire}}" (click)="cargaImporte(importe)">{{recarga.ImporteTiempoAire | currency}}</label>
+                            <!--<label formControlName="importe" ngDefaultControl #importe id="{{recarga.ImporteTiempoAire}}" (click)="cargaImporte(importe)">{{recarga.ImporteTiempoAire | currency}}</label> -->
+                            <label ngDefaultControl #importe id="{{recarga.ImporteTiempoAire}}" (click)="cargaImporte(importe)">{{recarga.ImporteTiempoAire | currency}}</label>
 
                             <div id="botonMontos" style="display:none; ">
                                 <div id="muestraMontos" name="muestraMontos" class="btn-group" role="group">
@@ -102,7 +103,7 @@
                             <label class="col-sm-2 control-label">Tel&eacute;fono</label>
 
                             <div class="col-sm-10">
-                                <input [matKeyboard]="'num'" formControlName="telefono" id="telefono" name="telefono" type="text" class="input-whidth form-control amount input-lg" />
+                                <input disabled="disabled" [matKeyboard]="'num'" formControlName="telefono" id="telefono" name="telefono" type="text" class="input-whidth form-control amount input-lg" />
                                 <div *ngIf="forma.hasError('maxlength', 'telefono')" class="alert alert-danger">
                                     El numero telefonico no puede ser mayor a 10 digitos.
                                 </div>
@@ -119,11 +120,11 @@
         <div style="margin:30px 20px 0px 0px;" class="row actions-form-group text-right">
             <div class="col-sm-9"></div>
             <div class="col-sm-2">
-                <button class="btn btn-lg" onClick="currentPage.loadMenu();">Regresar</button>
+                <button type="button" class="btn btn-lg" routerLink="/menuBXI">Regresar</button>
             </div>
-            <!-- <button class="btn btn-primary  btn-lg" ng-click="onSiguiente01();" ng-disabled="currentForm.$invalid"> -->
+            <!-- <button class="btn btn-primary [disabled]="!forma.valid" btn-lg" ng-click="onSiguiente01();"> -->
             <div class="col-sm-1">
-                <button id="continuarTA" [disabled]="!forma.valid" name="continuarspei" class="color-botones btn btn-lg " type="submit">
+                <button disabled="disabled" id="continuarTA" name="continuarspei" class="color-botones btn btn-lg " type="submit">
                   Continuar</button>
             </div>
         </div>
@@ -172,13 +173,15 @@
                     <div class="col-lg 12">
                         <div id="challenger" class="form-group">
                             <label>N&uacute;mero de seguridad</label>
-                            <input type='text' id='numeroSeguridad' class='form-control input-lg' ng-model='challenge.rcg' readonly>
+                            <label class='form-control input-lg'>{{NumeroSeguridad}}</label>
 
                         </div>
                         <div id="divPass" class="form-group">
-                            <label>TipoAutentica</label>
-
-                            <input type="password" class="form-control input-lg" #token [matKeyboard]="">
+                            <label>{{labelTipoAutentica}}</label>
+                            <input type="password" class="form-control input-lg" #token [matKeyboard]="'num'">
+                            <div *ngIf="(token.value == '')  && token.touched" class="alert alert-danger">
+                                <p color="danger" *ngIf="(token.value == '')">Dato obligatorio, favor de capturar. </p>
+                            </div>
                         </div>
                     </div>
                 </div>

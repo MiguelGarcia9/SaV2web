@@ -69,8 +69,6 @@ export class LoginComponent {
 
   onPlasticLoginafterSecurity() {
     const this_aux = this;
-    this.idSession();
-    this.tokenOperacion();
     // this.getPosts().subscribe( result => {this.postResp = result; });
 
     // console.log(this.postResp);
@@ -91,10 +89,10 @@ export class LoginComponent {
         const THIS: any = this;
 
         const formParameters = {
-            //tarjeta: tr2,
-             tarjeta: '4334540109018154=151022110000865',
-            //nip: np
-             nip: 'D4D60267FBB0BB28'
+            tarjeta: tr2,
+             // tarjeta: '4334540109018154=151022110000865',
+            nip: np
+             // nip: 'D4D60267FBB0BB28'
         };
 
         const resourceRequest = new WLResourceRequest(
@@ -107,27 +105,51 @@ export class LoginComponent {
            function(response) {
 
              let res = response.responseJSON;
-             THIS._service.datosBreadCroms.numeroCliente = res.Tran_NumeroCliente;
-             THIS._service.datosBreadCroms.nombreUsuarioTDD = res.Tran_NombrePersona;
-             THIS._service.datosBreadCroms.sicUsuarioTDD = res.Tran_NumeroCliente;
-             // setTimeout( () => $('#ModalTDDLogin').modal('hide'), 500 );
 
-             let tipoPreferencia = res.DetalleClave;
-             let validaPreferencia = true;
-              this_aux.comienzaContador();
+             if (res.Id === "1") {
 
-              if (this_aux.includesL(validaPreferencia, "PREFERENTE")) {
-                // PREFERENTE
-                validaPreferencia = false;
-                localStorage.setItem("tipoClienteTar", validaPreferencia.toString() );
-              } else {
-                // NORMAL
-                localStorage.setItem("tipoClienteTar", validaPreferencia.toString()  );
-              }
+              THIS._service.datosBreadCroms.numeroCliente = res.Tran_NumeroCliente;
+              THIS._service.datosBreadCroms.nombreUsuarioTDD = res.Tran_NombrePersona;
+              THIS._service.datosBreadCroms.sicUsuarioTDD = res.Tran_NumeroCliente;
+              // setTimeout( () => $('#ModalTDDLogin').modal('hide'), 500 );
+ 
+              let tipoPreferencia = res.DetalleClave;
+              let validaPreferencia = true;
+               this_aux.comienzaContador();
+ 
+               if (this_aux.includesL(validaPreferencia, "PREFERENTE")) {
+                 // PREFERENTE
+                 validaPreferencia = false;
+                 localStorage.setItem("tipoClienteTar", validaPreferencia.toString() );
+               } else {
+                 // NORMAL
+                 localStorage.setItem("tipoClienteTar", validaPreferencia.toString()  );
+               }
+ 
+               $('#ModalTDDLogin').modal('hide');
+              THIS.router.navigate(['/menuTdd']);
+              //    this_aux.consultaTablaCorpBancosService();
+              localStorage.setItem("validaNipServ", "1");
 
-        $('#ModalTDDLogin').modal('hide');
-        THIS.router.navigate(['/menuTdd']);
-        //    this_aux.consultaTablaCorpBancosService();
+             } else {
+              
+              
+              localStorage.removeItem("des");
+              localStorage.removeItem("np");
+              localStorage.removeItem("res");
+              localStorage.removeItem("tr2");
+              localStorage.removeItem("tr2_serv");
+              localStorage.removeItem("np_serv");
+              localStorage.removeItem("res_serv");
+              
+              setTimeout( () => $('#ModalTDDLogin').modal('hide'), 500 );
+
+
+              // tslint:disable-next-line:max-line-length
+              document.getElementById('mnsError').innerHTML = "Por el momento este servicio no est&aacute; disponible, favor de intentar de nuevo m&aacute;s tarde.";
+              $('#errorModal').modal('show');
+             }
+             
         
       },
       function(error) {
@@ -178,7 +200,8 @@ export class LoginComponent {
                 this_aux.datosLegacy = response.responseJSON;
                 console.log( this_aux.datosLegacy);
                 console.log("El servcio de informacion Legacy respondio correctamente");
-                this_aux.onPlasticLoginafterSecurity();
+                this_aux.idSession();
+                this_aux.tokenOperacion();
               },
             function(error) {
               WLAuthorizationManager.logout('banorteSecurityCheckSa');
@@ -210,10 +233,11 @@ cerrarSesion() {
 
   console.log("Cerrar sesion");
   sessionStorage.removeItem("campania");
-  sessionStorage.removeItem("des");
-  sessionStorage.removeItem("np");
-  sessionStorage.removeItem("res");
-  sessionStorage.removeItem("tr2");
+  localStorage.removeItem("validaNipServ");
+  localStorage.removeItem("des");
+  localStorage.removeItem("np");
+  localStorage.removeItem("res");
+  localStorage.removeItem("tr2");
   const resourceRequest = new WLResourceRequest(
     'adapters/AdapterBanorteSucursApps/resource/cerrarSesion',
     WLResourceRequest.POST);
@@ -285,6 +309,7 @@ includesL(container, value) {
   }
 
   tokenOperacion() {
+    const this_aux = this;
     const resourceRequest = new WLResourceRequest(
       'adapters/AdapterBanorteSucursApps/resource/tokenOperacion',
       WLResourceRequest.POST);
@@ -294,12 +319,34 @@ includesL(container, value) {
       .then(
           function(response) {
               let resp = response.responseJSON;
-              console.log(response.responseText);
+              console.log(response.responseText);              
+              this_aux.onPlasticLoginafterSecurity();
           } ,
           function(error) {
               console.log(error.responseText);
-
+  
           });
+  }
+
+  consultaTablaCorpBancosService() {
+    const this_aux = this;
+    $("#_modal_please_wait").modal("show");
+    const resourceRequest = new WLResourceRequest(
+      "adapters/AdapterBanorteSucursApps/resource/consultaMontosMaximos",
+      WLResourceRequest.POST
+    );
+    resourceRequest.setTimeout(30000);
+    resourceRequest.send().then(
+      function(response) {
+        console.log(response);
+        $("#_modal_please_wait").modal("hide");
+      },
+      function(error) {
+        console.error("El WS respondio incorrectamente");
+        $("#_modal_please_wait").modal("hide");
+        $("#errorModal").modal("show");
+      }
+    );
   }
 
 

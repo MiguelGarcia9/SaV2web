@@ -34,7 +34,7 @@ export class LoginBxiComponent implements OnInit {
    }
 
   ngOnInit() {
-      
+    
   }
   validaUsuario(usuarioBxi) {
       
@@ -65,7 +65,7 @@ export class LoginBxiComponent implements OnInit {
 
    getUsrPassLegacy(usrAgent, usuarioBxi) {
     const this_aux = this;
-    
+    $('#_modal_please_wait').modal('show');
 
         const patron = /@/g;
         usrAgent = usrAgent.replace(patron, '');
@@ -81,15 +81,28 @@ export class LoginBxiComponent implements OnInit {
         resourceRequest.sendFormParameters(formParameters).then(
             function(response) {
                 this_aux.datosLegacy = response.responseJSON;
+                const resLegacyJson = response.responseJSON;
                 console.log( this_aux.datosLegacy);
-                console.log("El servcio de informacion Legacy respondio correctamente");
-                this_aux.validaUsuarioAfterSecurity(usuarioBxi);
+                if (resLegacyJson.Id === '0') {
+                    WLAuthorizationManager.logout('banorteSecurityCheckSa');
+                   
+                    setTimeout(function() {
+                      $('#_modal_please_wait').modal('hide');
+                      $('#errorModal').modal('show');
+                    }, 500);
+                    
+                } else {
+                  console.log("El servcio de informacion Legacy respondio correctamente");
+                  this_aux.validaUsuarioAfterSecurity(usuarioBxi);
+
+                }
               },
             function(error) {
               
               WLAuthorizationManager.logout('banorteSecurityCheckSa');
-                console.error("Ocurrio un error con el servcio de informacion Legacy");
+                console.log("Ocurrio un error con el servcio de informacion Legacy");
                 $('#errorModal').modal('show');
+                $('#_modal_please_wait').modal('hide');
             });
     
 }
@@ -206,11 +219,13 @@ export class LoginBxiComponent implements OnInit {
 
                     if (infoUsuarioJSON.Sic === '99999999') {
                            
-                            WLAuthorizationManager.logout('banorteSecurityCheckSa');
-                            $('#_modal_please_wait').modal('hide');
-                            mensajeError = "Los datos proporcionados son incorrectos, favor de verificar.";
-                            document.getElementById('mnsError').innerHTML =  mensajeError;
-                            $('#errorModal').modal('show');
+                            setTimeout(function() {
+                              $('#_modal_please_wait').modal('hide');
+                              mensajeError = "Los datos proporcionados son incorrectos, favor de verificar.";
+                              document.getElementById('mnsError').innerHTML =  mensajeError;
+                              $('#errorModal').modal('show');
+                            }, 500);
+                           
                     } else {
                             this_aux.service.NombreUsuario = infoUsuarioJSON.NombreUsuario;
                             this_aux.service.infoUsuario = infoUsuario;
@@ -221,17 +236,19 @@ export class LoginBxiComponent implements OnInit {
 
                 } else {
 
-                 
-                  WLAuthorizationManager.logout('banorteSecurityCheckSa');
+                 setTimeout(function() {
                   $('#_modal_please_wait').modal('hide');
                   console.log(infoUsuarioJSON.Id + infoUsuarioJSON.MensajeAUsuario);
                   mensajeError = this_aux.controlarError(infoUsuarioJSON);
                   document.getElementById('mnsError').innerHTML =  mensajeError;
                   $('#errorModal').modal('show');
+                 }, 500);
+                  
                 }
 
           }, function(error) { 
-           
+            
+            this_aux.modalIdentificaUsuario();
             WLAuthorizationManager.logout('banorteSecurityCheckSa');
             this_aux.showErrorPromise(error);
           });

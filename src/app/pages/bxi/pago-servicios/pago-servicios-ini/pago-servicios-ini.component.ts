@@ -93,6 +93,7 @@ export class PagoServiciosIniComponent implements OnInit {
        lblAliasOrigen.innerHTML = elementHTML.textContent;
        lblCuentaOrigen.innerHTML = numCuenta_seleccionada.toString();
        this_aux.service.numCuentaSeleccionado = numCuenta_seleccionada;
+       this_aux.actualizaEmpresasXtipoPago(numCuenta_seleccionada);
        this_aux.getSaldoDeCuenta(numCuenta_seleccionada);
      }
 
@@ -111,13 +112,14 @@ export class PagoServiciosIniComponent implements OnInit {
                  $('#_modal_please_wait').modal('hide');
                }, 500);
              } else {
+              document.getElementById('lblSaldoOrigen').innerHTML = "";
               setTimeout(function() { 
               $('#_modal_please_wait').modal('hide');
                 this_aux.showErrorSucces(detalleSaldos);
               }, 500);
              }
            }, function(error) {
-
+            document.getElementById('lblSaldoOrigen').innerHTML = "";
             setTimeout(function() {
               $('#_modal_please_wait').modal('hide');
                 this_aux.showErrorPromise(error);
@@ -138,7 +140,6 @@ getEmpresas() {
 
            this_aux.arrayEmpresas.forEach(empresa => {
              const descripcion = empresa.Descripcion;
-             const idEmpresa = empresa.IdFacturador;
               this_aux.listaEmpresas.push(descripcion);
            });
            console.log(this_aux.listaEmpresas);
@@ -198,7 +199,7 @@ getEmpresas() {
          });
          if (valueFacturador === undefined) {
 
-          document.getElementById('mnsError').innerHTML = "Servicio invalidado, verifica tu elección;";
+          document.getElementById('mnsError').innerHTML = "Servicio invalidado, verifica tu elección.";
           $('#errorModal').modal('show');
 
          } else {
@@ -303,4 +304,52 @@ getEmpresas() {
     this.router.navigate(['/menuBXI']);
   }
 
+    actualizaEmpresasXtipoPago(numCtaSelec) {
+      const this_aux = this;
+      const cuentasString = this_aux.service.infoCuentas;
+      const consultaCuentas = JSON.parse(cuentasString);
+      const cuentasArray = consultaCuentas.ArrayCuentas;
+      let tipoCuenta;
+        cuentasArray.forEach(cuenta => {
+            if (cuenta.NoCuenta === numCtaSelec) {
+               
+              tipoCuenta = cuenta.TipoCuenta;
+            }
+      });
+
+      this_aux.listaEmpresas = [];
+      const facturadores =  localStorage.getItem('Facturadores').toString();
+      this_aux.arrayEmpresas = JSON.parse(facturadores);
+      if (tipoCuenta === 5) {
+          // filtro empresas con 
+
+          this_aux.arrayEmpresas.forEach(empresa => {
+            const tipoPago = empresa.TipoPago; 
+            if ( tipoPago.includes("06")) {
+              this_aux.listaEmpresas.push(empresa.Descripcion);
+            }
+          });
+          console.log(this_aux.listaEmpresas);
+          this_aux.listaEmpresasAux = this_aux.listaEmpresas;
+      } else if (tipoCuenta === 1) {
+
+          this_aux.arrayEmpresas.forEach(empresa => {
+           const tipoPago = empresa.TipoPago; 
+            if ( tipoPago.includes("04")) {
+              this_aux.listaEmpresas.push(empresa.Descripcion);
+            }
+          });
+          console.log(this_aux.listaEmpresas);
+          this_aux.listaEmpresasAux = this_aux.listaEmpresas;
+      } else {
+
+        this_aux.arrayEmpresas.forEach(empresa => {
+          const tipoPago = empresa.TipoPago; 
+             this_aux.listaEmpresas.push(empresa.Descripcion);
+           
+         });
+         console.log(this_aux.listaEmpresas);
+         this_aux.listaEmpresasAux = this_aux.listaEmpresas;
+      }
+    }
  }

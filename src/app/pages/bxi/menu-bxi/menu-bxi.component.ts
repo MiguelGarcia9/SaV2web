@@ -78,6 +78,42 @@ export class MenuBxiComponent implements OnInit {
     const this_aux = this;
     $('#_modal_please_wait').modal('show');
 
+    const tamArrayBeneficiarios = this_aux.countCuentasBene();
+    const tamArrayCuentas = this_aux.countCuentasUsuario();
+
+
+    if (tamArrayCuentas === 0) {
+
+      if (idOperacion === 'actualizaDatos') {
+        setTimeout(function() { 
+          $('#_modal_please_wait').modal('hide');
+          this_aux.getDatosContacto(idOperacion);
+          }, 1000);
+      } else {
+
+        setTimeout(function() { 
+          $('#_modal_please_wait').modal('hide');
+          document.getElementById('mnsError').innerHTML =   "Lo sentimos, no tienes cuentas relacionadas a tu usuario.";
+          $('#errorModal').modal('show');
+        }, 500);
+      }
+      
+    } else if (tamArrayBeneficiarios === 0) {
+      
+        if (idOperacion === 'actualizaDatos') {
+          setTimeout(function() { 
+            $('#_modal_please_wait').modal('hide');
+            this_aux.getDatosContacto(idOperacion);
+            }, 1000);
+        } else {
+        setTimeout(function() { 
+          $('#_modal_please_wait').modal('hide');
+          document.getElementById('mnsError').innerHTML =   "Lo sentimos, no tienes beneficiarios relacionados a tu usuario.";
+          $('#errorModal').modal('show');
+        }, 500);
+      }
+    } else {
+
     switch (idOperacion) {
       
       case 'saldoBXI': this_aux.router.navigate(['/saldosBXI']);
@@ -88,7 +124,10 @@ export class MenuBxiComponent implements OnInit {
             break;
       case 'compraTA': this_aux.router.navigate(['/CompraTaComponent']);
             break;
-      case 'pagotar': this_aux.router.navigate(['/pagoTarjetaCredito_ini']);
+      case 'pagotar': 
+                            
+                              this_aux.router.navigate(['/pagoTarjetaCredito_ini']);
+                            
             break;
       case 'activaAlertas': setTimeout(function() { 
                               $('#_modal_please_wait').modal('hide');
@@ -104,8 +143,7 @@ export class MenuBxiComponent implements OnInit {
             break;
       case 'impresionEDC': this_aux.router.navigate(['/impresion_EDC']);
             break;
-
-
+      }
     }
   }
 
@@ -188,7 +226,7 @@ export class MenuBxiComponent implements OnInit {
                     if (opc === 'activaAlertas') {  
                       setTimeout(function() { 
                           // tslint:disable-next-line:max-line-length
-                          document.getElementById('mnsError').innerHTML =   "Estimado cliente, es necesario que registres tu correo electrónico y número móvil poder continuar. ";
+                          document.getElementById('mnsError').innerHTML =   "Estimado cliente, es necesario que registres tu correo electrónico y número móvil para poder continuar. ";
                           $('#errorModal').modal('show');
                         }, 1000);
                       }
@@ -318,4 +356,33 @@ send(msg) {
   return false;
   }
 
+  countCuentasBene() {
+    const this_aux = this;
+    const arrayCuentasXBeneficiario = JSON.parse(this_aux.service.infoCuentasBeneficiarios); // JSON CON CUENTAS DE BENEFICIARIOS
+    let cuenta;
+    let tamCuentasBene = 0;
+    arrayCuentasXBeneficiario.forEach(element1 => {
+      if (element1.Cuenta !== undefined ) {
+        cuenta = element1.Cuenta;
+        cuenta.forEach(data => {
+            tamCuentasBene = tamCuentasBene + 1;
+        });
+      }
+    });
+    return tamCuentasBene;
+  }
+
+  countCuentasUsuario() {
+    const this_aux = this;
+    const cuentasString = this_aux.service.infoCuentas;
+    const consultaCuentas = JSON.parse(cuentasString);
+    const cuentasArray = consultaCuentas.ArrayCuentas;
+    let tamCuentasUsr = 0;
+    cuentasArray.forEach(cuenta => {
+          tamCuentasUsr = tamCuentasUsr + 1;
+    });
+    return tamCuentasUsr;
+  }
 }
+
+

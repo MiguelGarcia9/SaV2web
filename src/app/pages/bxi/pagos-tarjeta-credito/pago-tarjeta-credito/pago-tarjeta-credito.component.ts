@@ -125,12 +125,13 @@ export class PagoTarjetaCreditoComponent implements OnInit {
               } else {
 
                 setTimeout(function() {
+                  document.getElementById('lblSaldoOrigen').innerHTML = "";
                   $('#_modal_please_wait').modal('hide');
                   this_aux.showErrorSucces(detalleSaldos);
                }, 500); 
               }
         }, function(error) {
-
+          document.getElementById('lblSaldoOrigen').innerHTML = "";
           setTimeout(function() {
             $('#_modal_please_wait').modal('hide');
             this_aux.showErrorPromise(error);
@@ -272,7 +273,7 @@ export class PagoTarjetaCreditoComponent implements OnInit {
     this_aux.CuentaOrigen = this_aux.service.numCuentaSeleccionado;
     this_aux.nombreBanco = this_aux.service.nameBancoDestino;
     this_aux.Importe = this_aux.replaceSimbolo( montoAPagar);
-    this_aux.setTipoAutenticacionOnModal();
+    this_aux.validarSaldo(this_aux.CuentaOrigen, this_aux.Importe);
 
   }
 
@@ -422,7 +423,9 @@ export class PagoTarjetaCreditoComponent implements OnInit {
   }
 
   replaceSimbolo(importe) {
-    const importeAux = importe.replace('$', '');
+    let importeAux;
+    importeAux = importe.replace('$', '');
+    importeAux = importeAux.replace(',', '');
     return importeAux;
   }
 
@@ -510,4 +513,30 @@ export class PagoTarjetaCreditoComponent implements OnInit {
     this.router.navigate(['/menuBXI']);
   }
 
+  validarSaldo(numCuentaSelec, importe) {
+    const this_aux = this;
+    $('#_modal_please_wait').modal('show');
+    const operacionesbxi: OperacionesBXI = new OperacionesBXI();
+    operacionesbxi.consultaTablaYValidaSaldo(numCuentaSelec, importe).then(
+      function(response) {
+        let DatosJSON = response.responseJSON;
+        console.log(response.responseText);
+        if (DatosJSON.Id === "1") {
+          console.log("Pago validado");
+          this_aux.setTipoAutenticacionOnModal();
+        } else if ( DatosJSON.Id === "4" ) {
+          $('#modalLimiteDiario').modal('show');
+        } else if ( DatosJSON.Id === "5" ) {
+          $('#modalLimiteMensual').modal('show');
+        } else {
+          $('#errorModal').modal('show');
+        }
+        setTimeout(function() {$('#_modal_please_wait').modal('hide'); }, 500);
+      }, function(error) {
+        setTimeout(function() {
+          $('#_modal_please_wait').modal('hide'); 
+          this_aux.showErrorPromise(error);
+        }, 500);
+  });
+  }
 }
