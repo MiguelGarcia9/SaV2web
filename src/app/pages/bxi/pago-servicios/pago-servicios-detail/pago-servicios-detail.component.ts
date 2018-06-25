@@ -32,18 +32,19 @@ export class PagoServiciosDetailComponent implements OnInit {
   constructor( private service: SesionBxiService, private fb: FormBuilder, private router: Router, private currencyPipe: CurrencyPipe) {
 
     this.myForm = this.fb.group({
-      fcTelefono: ['', [Validators.required, Validators.minLength(10)]],
-       fcReferencia: ['', [Validators.required]],
-       fcDigitoVerificador: ['', [Validators.required]],
-      fcFechaVencimiento: ['', [Validators.required , Validators.pattern(/^\d{2,4}\-\d{1,2}\-\d{1,2}$/)]],
+     fcTelefono: ['', [Validators.required, Validators.minLength(10)]],
+     fcReferencia: ['', [Validators.required]],
+     fcDigitoVerificador: ['', [Validators.required]],
+     fcFechaVencimiento: ['', [Validators.required , Validators.pattern(/^\d{2,4}\-\d{1,2}\-\d{1,2}$/)]],
      fcImporte: ['', [Validators.required ]],
+     fcToken: []
 
     });
    }
 
   ngOnInit() {
     const this_aux = this;
-    $( ".cdk-visually-hidden" ).css( "margin-top", "7%" );
+    $( ".cdk-visually-hidden" ).css( "margin-top", "17%" );
         const detalleEmpresa = JSON.parse(this_aux.service.detalleEmpresa_PS);
           this_aux.nombreServicio =  detalleEmpresa.empresa;
           this_aux.service.nombreServicio = this_aux.nombreServicio;
@@ -138,8 +139,14 @@ export class PagoServiciosDetailComponent implements OnInit {
       const this_aux = this;
       const divChallenge = document.getElementById('challenger');
       const divTokenPass = document.getElementById('divPass');
+
+      const control: FormControl = new FormControl('', [Validators.required, Validators.pattern(/^([0-9])*$/)]);
+      this_aux.myForm.setControl('fcToken', control );
+
       if (this_aux.service.metodoAutenticaMayor.toString() === '5') {
+
         $('#_modal_please_wait').modal('show');
+
         this_aux.labelTipoAutentica = 'Token Celular';
         divTokenPass.setAttribute('style', 'display: block');
         const operacionesbxi: OperacionesBXI = new OperacionesBXI();
@@ -177,6 +184,7 @@ export class PagoServiciosDetailComponent implements OnInit {
         this_aux.labelTipoAutentica = 'Contrase&atilde;a';
       } else if (this_aux.service.metodoAutenticaMayor.toString()  === '1') {
 
+        
         divChallenge.setAttribute('style', 'display: none');
         divTokenPass.setAttribute('style', 'display: block');
         this_aux.labelTipoAutentica = 'Token Fisico';
@@ -395,5 +403,11 @@ export class PagoServiciosDetailComponent implements OnInit {
           $('#ModalLectordeRecibo').modal('hide');
         }
      }
+  }
+
+  ocultaModal() {
+    const this_aux = this;
+    const control: FormControl = new FormControl('');
+    this_aux.myForm.setControl('fcToken', control );
   }
 }
