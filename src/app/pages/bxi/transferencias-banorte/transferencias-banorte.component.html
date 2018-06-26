@@ -195,7 +195,7 @@
 
             <div class="modal-body" style="padding: 2rem;">
 
-                <h4 style="color: #eb012a; font-weight: 700;">Confirmar pago</h4>
+                <h4 style="color: #B01657; font-weight: 700;">Confirmar pago</h4>
                 <div class="row">
                     <div class="col-lg 6">
                         <label>Cuenta origen:</label>
@@ -240,18 +240,34 @@
                     </div>
                 </div>
                 <div class="row">
+                    <div class="col-lg-12">
+                        <label style="display: block; text-align: center; line-height: 280%; color: #eb012a;">Por favor captura tu <label>{{labelTipoAutentica}}</label> para poder continuar</label>
+                    </div>
+                </div>
+                <div class="row">
                     <div class="col-lg 12">
-                        <div id="challenger" class="form-group">
-                            <label>N&uacute;mero de seguridad</label>
-                            <label class='form-control input-lg'>{{NumeroSeguridad}}</label>
+                        <div id="challenger" class="row">
+                            <div class="col-lg 6">
+                                <label>N&uacute;mero de seguridad</label>
+                            </div>
+                            <div class="col-lg 6">
+                                <label class='form-control input-lg'>{{NumeroSeguridad}}</label>
+                            </div>
 
                         </div>
-                        <div id="divPass" class="form-group">
-                            <label>{{labelTipoAutentica}}</label>
-                            <input type="password" class="form-control input-lg" #token [matKeyboard]="'num'">
-                            <div *ngIf="(token.value == '')  && token.touched" class="alert alert-danger">
-                                <p color="danger" *ngIf="(token.value == '')">Dato obligatorio, favor de capturar. </p>
+                        <div id="divPass" class="row">
+                            <div class="col-lg 6">
+                                <label>{{labelTipoAutentica}}</label>
                             </div>
+                            <div class="col-lg 6">
+                                <label>
+                                <input type="password" class="form-control input-lg" #token [matKeyboard]="'num'">
+                                <div *ngIf="(token.value == '')  && token.touched" class="alert alert-danger">
+                                    <p color="danger" *ngIf="(token.value == '')">Dato obligatorio, favor de capturar. </p>
+                                </div>
+                                </label>
+                            </div>
+
                         </div>
                     </div>
                 </div>
