@@ -3,6 +3,7 @@ import { OperacionesBXI } from './../../operacionesBXI';
 import { Component, OnInit, ViewChild, ElementRef, Renderer2 } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, FormControl} from '@angular/forms';
 import { Router } from '@angular/router';
+import { CurrencyPipe } from '@angular/common';
 
 
 declare var jquery: any; // jquery
@@ -26,6 +27,7 @@ export class PagoServiciosIniComponent implements OnInit {
   myForm: FormGroup;
   empresaSelect: Boolean = false ;
   nombreEmpresaSelect: string;
+  SaldoOrigen: number;
 
 
    constructor( private fb: FormBuilder, private router: Router, private service: SesionBxiService, private renderer: Renderer2) {
@@ -62,13 +64,14 @@ export class PagoServiciosIniComponent implements OnInit {
    fillSelectCuentas() {
              const this_aux = this;
              const cuentasString = this_aux.service.infoCuentas;
+             const operacionesbxi: OperacionesBXI = new OperacionesBXI();
              console.log(this_aux.service.infoCuentas);
              const consultaCuentas = JSON.parse(cuentasString);
              const cuentasArray = consultaCuentas.ArrayCuentas;
                cuentasArray.forEach(cuenta => {
                    const li =  this.renderer.createElement('li');
                    const a = this.renderer.createElement('a');
-                   const textoCuenta = this.renderer.createText( cuenta.Alias);
+                   const textoCuenta = this.renderer.createText( cuenta.Alias + ' ' + operacionesbxi.mascaraNumeroCuenta(cuenta.NoCuenta));
                    this.renderer.setProperty(a, 'value', cuenta.NoCuenta);
                    this. renderer.listen(a, 'click', (event) => { this_aux.setDatosCuentaSeleccionada(event.target); });
                    this.renderer.appendChild(a, textoCuenta),
@@ -110,19 +113,20 @@ export class PagoServiciosIniComponent implements OnInit {
              if ( detalleSaldos.Id === '1') {
 
               setTimeout(function() {
-                const lblSaldoOrigen = document.getElementById('lblSaldoOrigen');
-                lblSaldoOrigen.innerHTML = detalleSaldos.SaldoDisponible;
+               
+                this_aux.SaldoOrigen = detalleSaldos.SaldoDisponible;
                  $('#_modal_please_wait').modal('hide');
                }, 500);
              } else {
-              document.getElementById('lblSaldoOrigen').innerHTML = "";
+              this_aux.SaldoOrigen = 0;
               setTimeout(function() { 
               $('#_modal_please_wait').modal('hide');
                 this_aux.showErrorSucces(detalleSaldos);
               }, 500);
              }
            }, function(error) {
-            document.getElementById('lblSaldoOrigen').innerHTML = "";
+           
+           this_aux.SaldoOrigen = 0;
             setTimeout(function() {
               $('#_modal_please_wait').modal('hide');
                 this_aux.showErrorPromise(error);

@@ -7,6 +7,7 @@ import { Router, CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot, Route
 import {CurrencyPipe} from '@angular/common';
 
 
+
 declare var jquery: any; // jquery
 declare var $: any;
 
@@ -34,6 +35,8 @@ export class PagoTarjetaCreditoComponent implements OnInit {
   importeAux: string;
   nombreBanco: string;
   NumeroSeguridad: string;
+  SaldoOrigen: number;
+  ImporteShow: number;
 
   // tslint:disable-next-line:max-line-length
   constructor(private router: Router, private service: SesionBxiService, private renderer: Renderer2,  private fb: FormBuilder, private currencyPipe: CurrencyPipe) {
@@ -80,9 +83,10 @@ export class PagoTarjetaCreditoComponent implements OnInit {
 
   crearListaCuentas(cuenta) {
     const this_aux = this;
+    const operacionesbxi: OperacionesBXI = new OperacionesBXI();
     const li =  this.renderer.createElement('li');
     const a = this.renderer.createElement('a');
-    const textoCuenta = this.renderer.createText( cuenta.Alias);
+    const textoCuenta = this.renderer.createText( cuenta.Alias + ' ' + operacionesbxi.mascaraNumeroCuenta(cuenta.NoCuenta) );
     this.renderer.setProperty(a, 'value', cuenta.NoCuenta);
     this. renderer.listen(a, 'click', (event) => { this_aux.setDatosCuentaSeleccionada(event.target); });
     this.renderer.appendChild(a, textoCuenta),
@@ -120,20 +124,20 @@ export class PagoTarjetaCreditoComponent implements OnInit {
             const detalleSaldos = response1.responseJSON;
               if ( detalleSaldos.Id === '1') {
                 setTimeout(function() {
-                  const lblSaldoOrigen = document.getElementById('lblSaldoOrigen');
-                  lblSaldoOrigen.innerHTML = detalleSaldos.SaldoDisponible;
+                  this_aux.SaldoOrigen = detalleSaldos.SaldoDisponible;
                   $('#_modal_please_wait').modal('hide');
                 }, 500);
               } else {
 
                 setTimeout(function() {
-                  document.getElementById('lblSaldoOrigen').innerHTML = "";
+
+                  this_aux.SaldoOrigen = 0;
                   $('#_modal_please_wait').modal('hide');
                   this_aux.showErrorSucces(detalleSaldos);
                }, 500); 
               }
         }, function(error) {
-          document.getElementById('lblSaldoOrigen').innerHTML = "";
+          this_aux.SaldoOrigen = 0;
           setTimeout(function() {
             $('#_modal_please_wait').modal('hide');
             this_aux.showErrorPromise(error);
@@ -275,6 +279,7 @@ export class PagoTarjetaCreditoComponent implements OnInit {
     const operacionesbxi: OperacionesBXI = new OperacionesBXI();
     this_aux.CuentaOrigen = operacionesbxi.mascaraNumeroCuenta( this_aux.service.numCuentaSeleccionado);
     this_aux.nombreBanco = this_aux.service.nameBancoDestino;
+    this_aux.ImporteShow = parseInt(this_aux.replaceSimbolo( montoAPagar), 10);
     this_aux.Importe = this_aux.replaceSimbolo( montoAPagar);
     this_aux.validarSaldo(this_aux.service.numCuentaSeleccionado, this_aux.Importe);
 
@@ -429,12 +434,15 @@ export class PagoTarjetaCreditoComponent implements OnInit {
         }
     }
   }
-
   replaceSimbolo(importe) {
-    let importeAux;
-    importeAux = importe.replace('$', '');
-    importeAux = importeAux.replace(',', '');
-    return importeAux;
+    const this_aux = this;
+    let importeAux = importe.replace('$', '');
+    const re = /\,/g;
+    importeAux = importeAux.replace(re, '');
+    console.log(importeAux);
+
+        return importeAux;
+          
   }
 
   controlarError(json) {

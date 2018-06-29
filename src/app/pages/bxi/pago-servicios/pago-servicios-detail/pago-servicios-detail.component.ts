@@ -28,6 +28,7 @@ export class PagoServiciosDetailComponent implements OnInit {
   importeAux: string;
   showFocus = true;
   NumeroSeguridad: string;
+  importeShow: number;
 
   constructor( private service: SesionBxiService, private fb: FormBuilder, private router: Router, private currencyPipe: CurrencyPipe) {
 
@@ -92,10 +93,10 @@ export class PagoServiciosDetailComponent implements OnInit {
     const this_aux = this;
     $('#_modal_please_wait').modal('show');
     const operacionesbxi: OperacionesBXI = new OperacionesBXI();
-    if (this_aux.importeAux === undefined) { this_aux.importeAux = this_aux.replaceSimbolo( this_aux.myForm.get('fcImporte').value); }
-    const patron = /,/g;  
+    if (this_aux.importeAux === undefined) {
+       this_aux.importeAux = this_aux.replaceSimbolo( this_aux.myForm.get('fcImporte').value); 
+     }  
     this_aux.importe = this_aux.importeAux;
-    this_aux.importe = this_aux.importe.replace(patron, '');
     operacionesbxi.consultaTablaYValidaSaldo(this_aux.cuentaCargo, this_aux.importe).then(
       function(response) {
         let DatosJSON = response.responseJSON;
@@ -124,8 +125,11 @@ export class PagoServiciosDetailComponent implements OnInit {
   }
   showDetallePago(myForm) {
     const this_aux = this;
-       if (this_aux.importeAux === undefined) { this_aux.importeAux = this_aux.replaceSimbolo( this_aux.myForm.get('fcImporte').value); }
+       if (this_aux.importeAux === undefined) { 
+         this_aux.importeAux = this_aux.replaceSimbolo( this_aux.myForm.get('fcImporte').value); 
+        }
        this_aux.importe = this_aux.importeAux;
+       this_aux.importeShow = parseInt(this_aux.importe, 10);
       console.log(this_aux.importe);
       this_aux.fechaVencimiento = myForm.fcFechaVencimiento.toString();
       if (this_aux.service.idFacturador === '1310') {
@@ -274,8 +278,13 @@ export class PagoServiciosDetailComponent implements OnInit {
   }
 
   replaceSimbolo(importe) {
-    const importeAux = importe.replace('$', '');
-    return importeAux;
+    const this_aux = this;
+    let importeAux = importe.replace('$', '');
+    const re = /\,/g;
+    importeAux = importeAux.replace(re, '');
+    console.log(importeAux);
+
+        return importeAux;
   }
 
   controlarError(json) {

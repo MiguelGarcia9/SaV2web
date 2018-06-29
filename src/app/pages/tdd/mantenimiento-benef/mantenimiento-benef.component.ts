@@ -11,6 +11,7 @@ import { Router, CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot, Route
 import { ResponseWS } from '../../../services/response/response.service';
 import { ValidaNipTransaccion } from '../../../services/validaNipTrans/validaNipTrans.service';
 import { ConsultaSaldosTddService } from '../../../services/saldosTDD/consultaSaldos.service';
+import { consultaCatalogos } from '../../../services/consultaCatalogos/consultaCatalogos.service';
 
 declare var $: any;
 declare var angular: any;
@@ -60,6 +61,7 @@ export class MantenimientoBenefComponent implements OnInit {
   opcion: any = 0;
   bloquearAlta: any = false;
   numeroCuentaTitular: string;
+  mostrarCuentaMascara: string;
   saldoDisponibleClienteTdd: string;
 
   registroFederal: any = "";
@@ -115,10 +117,11 @@ export class MantenimientoBenefComponent implements OnInit {
     $('#_modal_please_wait').modal('show');
     this._service.validarDatosSaldoTdd().then(
       mensaje => {
-
+        const operaciones: consultaCatalogos = new consultaCatalogos();
         console.log('Saldos cargados correctamente TDD');
         this.saldoDisponibleClienteTdd = mensaje.SaldoDisponible;
         this.numeroCuentaTitular = mensaje.NumeroCuenta;
+        this.mostrarCuentaMascara = operaciones.mascaraNumeroCuenta(this.numeroCuentaTitular);
         this.consultaBeneficiarios();
       }
     ); 
@@ -305,7 +308,7 @@ export class MantenimientoBenefComponent implements OnInit {
     };
 
     const resourceRequest = new WLResourceRequest(
-       'adapters/AdapterBanorteSucursApps/resource/consultaMantenimientoBeneficiarios',
+       'adapters/AdapterBanorteSucursApps2/resource/consultaMantenimientoBeneficiarios',
       WLResourceRequest.POST
     );
     resourceRequest.setTimeout(30000);
@@ -395,7 +398,7 @@ export class MantenimientoBenefComponent implements OnInit {
     };
 
     const resourceRequest = new WLResourceRequest(
-       'adapters/AdapterBanorteSucursApps/resource/bajaMantenimientoBeneficiarios',
+       'adapters/AdapterBanorteSucursApps2/resource/bajaMantenimientoBeneficiarios',
       WLResourceRequest.POST
     );
     resourceRequest.setTimeout(30000);
@@ -535,7 +538,7 @@ export class MantenimientoBenefComponent implements OnInit {
     };
 
     const resourceRequest = new WLResourceRequest(
-       'adapters/AdapterBanorteSucursApps/resource/altaMantenimientoBeneficiarioMoral',
+       'adapters/AdapterBanorteSucursApps2/resource/altaMantenimientoBeneficiarioMoral',
       WLResourceRequest.POST
     );
     resourceRequest.setTimeout(30000);
@@ -591,7 +594,7 @@ export class MantenimientoBenefComponent implements OnInit {
     };
 
     const resourceRequest = new WLResourceRequest(
-      'adapters/AdapterBanorteSucursApps/resource/altaMantenimientoBeneficiarioFisica',
+      'adapters/AdapterBanorteSucursApps2/resource/altaMantenimientoBeneficiarioFisica',
       WLResourceRequest.POST
     );
     resourceRequest.setTimeout(30000);
@@ -942,7 +945,7 @@ export class MantenimientoBenefComponent implements OnInit {
     };
 
     const resourceRequest = new WLResourceRequest(
-      'adapters/AdapterBanorteSucursApps/resource/modificarBeneficiarios',
+      'adapters/AdapterBanorteSucursApps2/resource/modificarBeneficiarios',
       WLResourceRequest.POST
     );
     resourceRequest.setTimeout(30000);

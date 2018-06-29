@@ -205,10 +205,12 @@ getSaldoDeCuenta(numCuenta_seleccionada) {
         if ( detalleSaldos.Id === '1') {
           const lblSaldoOrigen = document.getElementById('lblSaldoOrigen');
           lblSaldoOrigen.innerHTML = detalleSaldos.SaldoDisponible;
+          setTimeout(() => $('#_modal_please_wait').modal('hide'), 3000);
         } else {
           console.log(detalleSaldos.MensajeAUsuario);
           document.getElementById('mnsError').innerHTML = detalleSaldos.MensajeAUsuario;
           $('#errorModal').modal('show');
+          setTimeout(() => $('#_modal_please_wait').modal('hide'), 3000);
         }
       }, function(error) {
   });
@@ -305,20 +307,23 @@ getSaldoDeCuenta(numCuenta_seleccionada) {
 
 
   setTipoAutenticacionOnModal() {
+
+    $('#inputToken').val('');
+    
     const this_aux = this;
     const divChallenge = document.getElementById('challenger');
     const divTokenPass = document.getElementById('divPass');
     if (this_aux.service.metodoAutenticaMayor.toString() === '5') {
       $('#_modal_please_wait').modal('show');
       this_aux.labelTipoAutentica = 'Token Celular';
-      divTokenPass.setAttribute('style', 'display: block');
+      divTokenPass.setAttribute('style', 'display: flex');
       const operacionesbxi: OperacionesBXI = new OperacionesBXI();
       operacionesbxi.preparaAutenticacion().then(
         function(response) {
           const detallePrepara = response.responseJSON;
           console.log(detallePrepara);
           if (detallePrepara.Id === 'SEG0001') {
-            divChallenge.setAttribute('style', 'display: block');
+            divChallenge.setAttribute('style', 'display: flex');
             this_aux.NumeroSeguridad = detallePrepara.MensajeUsuarioUno;
             setTimeout(() => {
               $('#_modal_please_wait').modal('hide');
@@ -343,12 +348,12 @@ getSaldoDeCuenta(numCuenta_seleccionada) {
     } else if (this_aux.service.metodoAutenticaMayor.toString()  === '0') {
 
       divChallenge.setAttribute('style', 'display: none');
-      divTokenPass.setAttribute('style', 'display: block');
+      divTokenPass.setAttribute('style', 'display: flex');
       this_aux.labelTipoAutentica = 'Contrase&atilde;a';
     } else if (this_aux.service.metodoAutenticaMayor.toString()  === '1') {
 
       divChallenge.setAttribute('style', 'display: none');
-      divTokenPass.setAttribute('style', 'display: block');
+      divTokenPass.setAttribute('style', 'display: flex');
       this_aux.labelTipoAutentica = 'Token Fisico';
     }
 

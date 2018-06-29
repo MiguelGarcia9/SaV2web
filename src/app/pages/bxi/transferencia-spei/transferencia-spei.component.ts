@@ -21,7 +21,7 @@ let ctaDest = "";
 
 let tipoCuenta = "";
 let bancoRecept = "";
-let clabe = "";
+//let clabe = "";
 let nombreBene = "";
 let ref = "";
 
@@ -30,6 +30,7 @@ let descripcion = "";
 let correo = "";
 let rfcEmi = "";
 let aliasCta = "";
+let clabeTEF_SPEI = "";
 
 let bancoRecep = "";
 let refFront = "";
@@ -58,6 +59,7 @@ export class TransferenciaSpeiComponent implements OnInit {
 
   labelTipoAutentica: string;
   CuentaDestino: string;
+  CuentaDestinoM: string;
 
 
   cuentaOrigenModal = "";
@@ -110,7 +112,7 @@ export class TransferenciaSpeiComponent implements OnInit {
 
       'cuenta': new FormControl('', [Validators.required, Validators.maxLength(20)]),
       'sel1': new FormControl('', [Validators.required]),
-      'clabe': new FormControl('', [Validators.required, Validators.maxLength(16)]),
+      //'clabe': new FormControl('', [Validators.required, Validators.maxLength(16)]),
       'ammountQUICK': new FormControl('', [Validators.required, Validators.min(0), Validators.max(7000)]),
       'referenceQuick': new FormControl('', [Validators.required, Validators.maxLength(7)])
     });
@@ -181,6 +183,7 @@ export class TransferenciaSpeiComponent implements OnInit {
                         this_aux.bancoReceptF = data;
                       });
 
+                      /*
                       this.forma.controls['clabe'].valueChanges.subscribe(
                         data => {
                           console.log('clabe', data);
@@ -188,7 +191,7 @@ export class TransferenciaSpeiComponent implements OnInit {
 
                           this_aux.clabeF = data;
                         });
-
+                      */
                         this.forma.controls['ammountQUICK'].valueChanges.subscribe(
                           data => {
                             console.log('ammountQUICK', data);
@@ -294,7 +297,9 @@ export class TransferenciaSpeiComponent implements OnInit {
   showDetallePago() {
     const this_aux = this;
 
-
+    $('#inputTokenSPEI').val('');
+    $('#inputTokenTEF').val('');
+    $('#inputTokenQUICK').val('');
 
     console.log("adentro Trnsferencias Internacionales");
 
@@ -325,7 +330,7 @@ export class TransferenciaSpeiComponent implements OnInit {
 
       tipoCuenta = this_aux.tipoCuentaF;
       bancoRecept =  this_aux.bancoReceptF;
-      clabe = this_aux.clabeF;
+      //clabe = this_aux.clabeF;
       importe = this_aux.importeF;
       ref = this_aux.refF;
 
@@ -348,14 +353,14 @@ export class TransferenciaSpeiComponent implements OnInit {
     if (this_aux.service.metodoAutenticaMayor.toString() === '5') {
       $('#_modal_please_wait').modal('show');
       this_aux.labelTipoAutentica = 'Token Celular';
-      divTokenPass.setAttribute('style', 'display: block');
+      divTokenPass.setAttribute('style', 'display: flex');
       const operacionesbxi: OperacionesBXI = new OperacionesBXI();
       operacionesbxi.preparaAutenticacion().then(
         function(response) {
           const detallePrepara = response.responseJSON;
           console.log(detallePrepara);
           if (detallePrepara.Id === 'SEG0001') {
-            divChallenge.setAttribute('style', 'display: block');
+            divChallenge.setAttribute('style', 'display: flex');
             this_aux.NumeroSeguridad = detallePrepara.MensajeUsuarioUno;
             setTimeout(() => {
               $('#_modal_please_wait').modal('hide');
@@ -380,12 +385,12 @@ export class TransferenciaSpeiComponent implements OnInit {
     } else if (this_aux.service.metodoAutenticaMayor.toString()  === '0') {
 
       divChallenge.setAttribute('style', 'display: none');
-      divTokenPass.setAttribute('style', 'display: block');
+      divTokenPass.setAttribute('style', 'display: flex');
       this_aux.labelTipoAutentica = 'Contrase&atilde;a';
     } else if (this_aux.service.metodoAutenticaMayor.toString()  === '1') {
 
       divChallenge.setAttribute('style', 'display: none');
-      divTokenPass.setAttribute('style', 'display: block');
+      divTokenPass.setAttribute('style', 'display: flex');
       this_aux.labelTipoAutentica = 'Token Fisico';
     }
 
@@ -500,7 +505,7 @@ setDatosCuentaSeleccionada(elementHTML) {
   const numCuenta_seleccionada = elementHTML.value;
   const AliasCuenta_seleccionada = elementHTML.text;
 
-  tableOrigen.setAttribute('style', 'display: block');
+  tableOrigen.setAttribute('style', 'display: flex');
   tableDefaultOrigen.setAttribute('style', 'display: none');
 
   lblAliasOrigen.innerHTML = elementHTML.textContent;
@@ -508,7 +513,10 @@ setDatosCuentaSeleccionada(elementHTML) {
   lblCuentaOrigen.innerHTML = operacionesbxi.mascaraNumeroCuenta(numCuenta_seleccionada.toString());
   this_aux.service.numCuentaSPEISel = numCuenta_seleccionada;
   this_aux.service.AliasCuentaSPEISel = AliasCuenta_seleccionada;
-  this_aux.cuentaOrigenModal = this_aux.service.numCuentaSPEISel;
+  this_aux.cuentaOrigenModal = operacionesbxi.mascaraNumeroCuenta(this_aux.service.numCuentaSPEISel);
+
+
+
   this_aux.getSaldoDeCuenta(numCuenta_seleccionada);
 
 
@@ -525,10 +533,13 @@ getSaldoDeCuenta(numCuenta_seleccionada) {
         if ( detalleSaldos.Id === '1') {
           const lblSaldoOrigen = document.getElementById('lblSaldoOrigen');
           lblSaldoOrigen.innerHTML = detalleSaldos.SaldoDisponible;
+          setTimeout(() => $('#_modal_please_wait').modal('hide'), 3000);
+
         } else {
           console.log(detalleSaldos.MensajeAUsuario);
           document.getElementById('mnsError').innerHTML = detalleSaldos.MensajeAUsuario;
           $('#errorModal').modal('show');
+          setTimeout(() => $('#_modal_please_wait').modal('hide'), 3000);
         }
       }, function(error) {
   });
@@ -605,6 +616,8 @@ crearListaBeneficiarios(data) {
 
 setDatosCuentaBeneficiario(elementHTML) {
 
+  const operacionesbxi: OperacionesBXI = new OperacionesBXI();
+
   const this_aux = this;
   console.log(elementHTML);
   const tableBeneficiarios = document.getElementById('tableBeneficiarios');
@@ -613,11 +626,12 @@ setDatosCuentaBeneficiario(elementHTML) {
   const lbDescripcionCtaBen = document.getElementById('lbDescripcionCtaBen');
   const valueElement = elementHTML.value;
 
-  tableBeneficiarios.setAttribute('style', 'display: block');
+  tableBeneficiarios.setAttribute('style', 'display: flex');
   tableDefaultBeneficiarios.setAttribute('style', 'display: none');
   lbDescripcionCtaBen.innerHTML = elementHTML.textContent;
   lblCuentaDestino.innerHTML = this_aux.getNumeroCuentaDestino(valueElement);
   this_aux.CuentaDestino = this_aux.getNumeroCuentaDestino(valueElement);
+
   this_aux.service.numCuentaDestinario = this_aux.CuentaDestino;
   this_aux.service.claveBancoDestino = this_aux.getNameInstitucion(valueElement);
   this_aux.service.claveAliasCuenta = this_aux.getNameAliasCuenta(valueElement);
@@ -842,11 +856,11 @@ consultaClabeSaldos(numCuentaDestinario_seleccionada) {
 
           // Bloquear campos
 
-          /*
+
           $('#amountSPEI').prop("disabled", true);
           $('#descriptionSPEI').prop("disabled", true);
           $('#referenceSPEI').prop("disabled", true);
-          */
+
 
         }
       }, function(error) {
@@ -893,12 +907,16 @@ validaDatosBen() {
     sic = this_aux.service.infoUsuarioSIC;
     bancoRecep = this_aux.service.claveBancoDestino;
     aliasCta = this_aux.service.claveAliasCuenta;
+    clabeTEF_SPEI = this_aux.replaceSpaces(this_aux.service.clabeDestinatario);
 
-    if (clabe === null || clabe === "") {
+    /*
+    if (clabe === null || clabe === "" || clabe === undefined) {
       clabe = "014180570107939481";
     } else {
       clabe = this_aux.service.clabeDestinatario;
     }
+    */
+    // this_aux.service.clabeDestinatario
 
 
     // nombreBene
@@ -935,7 +953,7 @@ validaDatosBen() {
               if (infoUsuarioJSON.Id === 'SEG0001') {
                   console.log('Nivel de autenticacion alcanzado');
 
-                  operacionesbxi.confirmaTransferSPEI(ctaO, ctaDest, sic, bancoRecep, clabe,
+                  operacionesbxi.confirmaTransferSPEI(ctaO, ctaDest, sic, bancoRecep, clabeTEF_SPEI,
                                                       nombreBene, refFront, importeFront,
                                                       descripcionFront, correo, rfcEmi, aliasCta)
                   .then(
@@ -985,7 +1003,7 @@ validaDatosBen() {
                   console.log('Nivel de autenticacion alcanzado');
 
                   operacionesbxi.confirmaTransferTEF(this_aux.service.AliasCuentaSPEISel, ctaO, sic, rfcEmi,
-                                                     this_aux.service.claveAliasCuenta , this_aux.service.claveNumBenefi, clabe,
+                                                     this_aux.service.claveAliasCuenta , this_aux.service.claveNumBenefi, clabeTEF_SPEI,
                                                      this_aux.service.NombreUsuario, importeFront, descripcionFront, refFront)
 
                   .then(
@@ -1035,7 +1053,8 @@ validaDatosBen() {
                   console.log('Nivel de autenticacion alcanzado');
 
                   operacionesbxi.confirmaTransferQUICK(ctaO, this_aux.tipoCuentaF, sic, this_aux.bancoRecep.trim(),
-                                                      this_aux.clabeF, nombreBene, this_aux.refF , importeFront,
+                                                      //this_aux.clabeF,
+                                                       nombreBene, this_aux.refF , importeFront,
                                                       descripcionFront, correo, rfcEmi)
                   .then(
 
@@ -1184,6 +1203,11 @@ transformAmount(impor) {
 
 
 
+}
+
+replaceSpaces(cadena) {
+  const cadenaLimpia = cadena.replace(/\s+/g,"");
+  return cadenaLimpia;
 }
 
 replaceSimbolo(impor) {
