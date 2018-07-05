@@ -93,7 +93,7 @@ html {
 }
 
 .espacioBotones {
-    margin-left: 115px;
+    margin-left: 140px;
 }
 
 
@@ -641,8 +641,7 @@ select.selectModificado::-ms-expand {
 }
 
 .color-letra {
-    color: #eb0029;
-    ;
+    color: rgb(236, 28, 45);
 }
 
 .sumando-list-group .list-group-item {
@@ -741,6 +740,11 @@ input[type=time] .input-lg,
 input[type=datetime-local] .input-lg,
 input[type=month] .input-lg {
     line-height: 53px
+}
+
+input[type=text] {
+   
+    font-size: 22px;
 }
 
 .padding-top-15 {
@@ -1318,4 +1322,12 @@ button#buttonImageMantoBen {
 
 #txtReadCode:focus{
 	outline:0px;
+}
+
+.alert {
+    position: relative;
+    padding: 4px 0px 0px 9px !important;
+    margin-bottom: 0px !important; 
+    border: 1px solid transparent; 
+    border-radius: .25rem; 
 }

@@ -108,7 +108,7 @@ export class PagoTarjetaCreditoComponent implements OnInit {
 
     tableOrigen.setAttribute('style', 'display: block');
     tableDefaultOrigen.setAttribute('style', 'display: none');
-    lblAliasOrigen.innerHTML = elementHTML.textContent;
+    lblAliasOrigen.innerHTML = this_aux.getCtaFromTextContet(elementHTML.textContent);
     lblCuentaOrigen.innerHTML = operacionesbxi.mascaraNumeroCuenta(numCuenta_seleccionada.toString());
     this_aux.service.numCuentaSeleccionado = numCuenta_seleccionada;
     this_aux.getSaldoDeCuenta(numCuenta_seleccionada);
@@ -183,9 +183,10 @@ export class PagoTarjetaCreditoComponent implements OnInit {
   crearListaBeneficiarios(data, isBanorte) {
 
             const this_aux = this;
+            const operacionesbxi: OperacionesBXI = new OperacionesBXI();
             const li =  this.renderer.createElement('li');
             const a = this.renderer.createElement('a');
-            const textoCuenta = this.renderer.createText( data.Alias);
+            const textoCuenta = this.renderer.createText( data.Alias + ' ' + data.NoCuenta);
             if ( isBanorte) {
                 this.renderer.setProperty(a, 'value', data.NoCuenta + ',Banorte' );
             } else {
@@ -230,7 +231,7 @@ export class PagoTarjetaCreditoComponent implements OnInit {
 
     tableBeneficiarios.setAttribute('style', 'display: block');
     tableDefaultBeneficiarios.setAttribute('style', 'display: none');
-    lbDescripcionCtaBen.innerHTML = elementHTML.textContent;
+    lbDescripcionCtaBen.innerHTML = this_aux.getCtaFromTextContet(elementHTML.textContent);
     lblCuentaDestino.innerHTML = this_aux.getNumeroCuentaDestino(valueElement);
     this_aux.CuentaDestino =  this_aux.getNumeroCuentaDestino(valueElement);
     this_aux.service.numCtaBenSeleccionada = this_aux.CuentaDestino;
@@ -560,5 +561,17 @@ export class PagoTarjetaCreditoComponent implements OnInit {
     const this_aux = this;
     const control: FormControl = new FormControl('');
     this_aux.myForm.setControl('fcToken', control );
+  }
+
+   getCtaFromTextContet(textContent) {
+    
+    const re = /\*/g;
+    const reNum = /\d/g;
+    let textContentAux = textContent.replace(re, '');
+    textContentAux = textContentAux.replace(reNum, '');
+    console.log(textContentAux);
+
+    return textContentAux;
+
   }
 }

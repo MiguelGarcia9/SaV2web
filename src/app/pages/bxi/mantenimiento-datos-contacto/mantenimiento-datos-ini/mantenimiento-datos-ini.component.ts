@@ -18,8 +18,8 @@ export class MantenimientoDatosIniComponent implements OnInit {
   myForm: FormGroup;
   IsControlCorreo = false;
   IsControlCelular = false;
-  showCorreoError = false;
-  showCelularError = false;
+ // showCorreoError = false;
+  // showCelularError = false;
 
   constructor(private service: SesionBxiService, private fb: FormBuilder, private router: Router) {
     this.myForm = this.fb.group({
@@ -73,7 +73,7 @@ export class MantenimientoDatosIniComponent implements OnInit {
     const this_aux = this;
     numCelHTML.readOnly = false;
     // tslint:disable-next-line:max-line-length
-    const control: FormControl = new FormControl(this_aux.numeroCelular.nativeElement.value, [Validators.required, Validators.pattern(/^([0-9])*$/), Validators.minLength(10) ]);
+    const control: FormControl = new FormControl(this_aux.numeroCelular.nativeElement.value, [Validators.required, Validators.pattern(/^([0-9])*$/), Validators.minLength(10), Validators.maxLength(10) ]);
     this_aux.myForm.setControl('fcCelular', control );
     this_aux.IsControlCelular = true;
   }
@@ -109,17 +109,17 @@ export class MantenimientoDatosIniComponent implements OnInit {
 
   }
 
-  ErrorPatternCorreo(status) {
+  /*ErrorPatternCorreo(status) {
     const this_aux = this;
     if (status === 'show') {this_aux.showCorreoError = true;
     } else { this_aux.showCorreoError = false;    }
-  }
+  }*/
 
-  ErrorPatternCelular(status) {
+ /* ErrorPatternCelular(status) {
     const this_aux = this;
     if (status === 'show') {this_aux.showCelularError = true;
     } else { this_aux.showCelularError = false;    }
-  }
+  }*/
 
   showErrorPromise(error) {
 
